@@ -1,0 +1,5 @@
+Spring boot needs to enter username and password
+Configuring static credentials inside application.properties file
+spring.security.user.name=kunal
+spring.security.user.password=kunal123
+Open new ingonito window and test
