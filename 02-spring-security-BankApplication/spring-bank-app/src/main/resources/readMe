@@ -1,0 +1,35 @@
+By default spring security fram protects all the paths present inside web app. THis behavior is due to the code
+present inside the method defaultSecurityFilterChain(HttpSecurity http) of
+class SpringBootWebSecurityConfiguration(See class contents). method snippet below
+
+      @Bean
+      @Order(SecurityProperties.BASIC_AUTH_ORDER)
+      SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+      			http.authorizeHttpRequests().anyRequest().authenticated();
+      			http.formLogin();
+      			http.httpBasic();
+      			return http.build(); //return an object of type security filter chain using @Bean
+      		}
+
+      		accessing HttpSecurity by using http we are saying any request which comes has to be authenticated
+      		  http.authorizeHttpRequests().anyRequest().authenticated();
+      		The request can come from form login  or through http request such request we want to be authenticated thatswhy
+            http.formLogin();
+            http.httpBasic();
+
+      We can make our own coniguration:
+        create ProjectSecurityConfig inside /config anootate with @config
+          when we @config it says to spring framework we have certain configuration so that during the startup is going to
+          scan for all beans that we have described inside this class(ProjectSecurityconfig)
+
+          Copy the entire defaultFIlterchain method and copy it inside custom config.
+          use .autheticated to enable authentication and .permitAll() to allow without authetication
+
+          we can also deny all out request
+          .anyRequest().denyAll() //not recommended for production purpose
+          even after login it says access to localhost was denied
+          when we are denying request authorization comes into picture inorder to deny spring security as to authenticate reuest
+          thatswhy it is first asking credentials ..even after it returns 403 error which is authorization denied error
+
+          similarly we can permitAll() where no authetication is required. //not recommended for production
+          Thus we can have two configurations which will invoke based on scope
