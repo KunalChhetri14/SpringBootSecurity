@@ -3,3 +3,73 @@ Configuring static credentials inside application.properties file
 spring.security.user.name=kunal
 spring.security.user.password=kunal123
 Open new ingonito window and test
+
+Why learn spring security?
+Already prebuilt security functionalites. As as developer we can focus more on the bussiness logic rather
+than implementing our own security from scratch.
+It also handles security vulnerabilites like csrf, cors. For any security vulnerabilites identified, the framework
+will be patched immediately as it is being used by many organizations.
+Ease in authtication like username/password authentication, JWT tokens, OAuth2, OpenID etc.
+
+
+Spring security internal flow:
+For diagram: resources/assets/images/spring-security-interna- flow-image
+
+Servlets and Fiters
+In java web app, Servlet containers(web server) takes care of translating the http messages for java code
+to understand. One of the mostly used servlet container is apche tomcat. Servlet containers converts the http messages into
+servlet request and hand over to servlet method as a parameter. Similarly servletResponse returns as an output to servlet containers
+from servlet. So everuthing we write inside java web apps are driven by servlets.
+
+Role of filters
+Filters inside java web app can be used to intercept each request/response and do some prework before our bussiness logic.
+so using the same filters, Spring security enforce security based on our configuration  insida a web app.
+
+
+  Client sending request ---> Filters --->> Servlets
+
+Spring security internal flow
+  Like you can see in image spring-security-demo
+  i) the user will enter credentials
+    as soon as request is received by servlet container since we have added spring security to classpath
+    ther are some filters which intercepts each and every request. Based on the path we will determine whether it is protected
+    or publicly accessed resource.
+    Once loged in from 2nd time onwards my spring filter will also have logic to check whether the user is
+    authenticated user or not. It will simply use the generated session id generated using login page.
+  ii) During this process spring will also extract the username and password and then wil convert it into authentication object
+  inside the step ii as show in image. Once the authentication object is formed it will handover the request to
+    authentication manager.
+  iii) Authentication manager is a class which will manage the actual authentiaction logic.
+    It will what all authentication provider inside web application. We can write the actual logic inside auth provider.
+     Whether we want to validate the autheication from database, LDAP server or from authorization server or from cache.
+  iv) Authenication providers: there can be multiple auth providers. Whether we want one auth provider where we want to handle
+    username and password and the other where we want framework for loggin in.
+    Responsility is to identify what all auth provider for this paritcular request.
+    Suppose one auth provider fails then it wont directly send the response back to auth manager and then to user but
+    instead it trys with all type of available auth providers.
+    Inside auth provider we can write actual auth logic or we can also leverage and leverage spring security provided interface
+    which are userDetailsManger and UserDetailsService. Since we also passwords which needs to be stored in a secure manner
+    thatswhy we should always encrypt. Inorder to impl password envryption logic we have Password Encoder interface.
+
+    ** Once auth providers verifies then it wil send response back to auth manager and spring secutity filters and before
+    sending response it will save those authentication object into SecurityContext.
+
+    Code flow of security internal flow:
+    Firstly the control goes to UserNamePasswordAuthenticationFilter
+    	Inside UserNamePasswordAuthenticationFilter firstly we get username and password and forms a UsernamePasswordAuthenticationToken object.
+    	But in the fig in 2nd step the framework is ging to form an authenitcatin object whereras here we see different object which is UsernamePasswordAuthenticationToken object.
+    	When we open UsernamePasswordAuthenticationToken class we see it extends AsbstractAuthenticationToken
+    	On digging deep inside AbstractAuthenticationtoken we see this class implements authentication interface. Therefore we can't create obj of authentication interface
+    	therefore we create username, password  stored object of type class UsernamePasswordAuthenticationToken which implements authentication interface.
+
+    	Therefore our filter is going to create a object. The same object is handover to AuthenticationManager to authenticate. Again autheincation manager is an inteface. So inseide
+    	spring security framework we have provider manager which is implementation of authenticationManager. Inisde this class we have autheticate method
+    	The provider manager will forloop each and every provider util and unless authetication is successful. If 2 auth provider for your login flow, if the 1st gives login successful
+    	the framework is not going to try for second authentication provider.
+    	All auth provider are gind to take help from UserDetailsManager or UserDetailsService
+    	DaoAuthenticationProvider is goind to take the help from one of the user details manager implementation and that class is
+    		InMemoryUserDetailsManager( class which implements UserDetailsManagerand UserDetailsPasswordService interface)
+    		Inside InMemoryUserDetailsManager we have loadUserByUsername(String username) , this user will be populated during the startup based on the userdetails we
+    		have configured inside properties.
+    		retrieveUser return UserDetails back to the authenticate method. Inside this we are passing the same user details to additionalAuthenticationChecks
+
