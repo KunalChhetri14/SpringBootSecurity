@@ -54,7 +54,7 @@ Spring security internal flow
     ** Once auth providers verifies then it wil send response back to auth manager and spring secutity filters and before
     sending response it will save those authentication object into SecurityContext.
 
-    Code flow of security internal flow:
+    Code flow of security internal flow: Refer to Sequence-flow-detail and abstract diagram
     Firstly the control goes to UserNamePasswordAuthenticationFilter
     	Inside UserNamePasswordAuthenticationFilter firstly we get username and password and forms a UsernamePasswordAuthenticationToken object.
     	But in the fig in 2nd step the framework is ging to form an authenitcatin object whereras here we see different object which is UsernamePasswordAuthenticationToken object.
